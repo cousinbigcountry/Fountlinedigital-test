@@ -1,0 +1,62 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: fd-db
+    environment:
+      POSTGRES_DB: fdwa
+      POSTGRES_USER: fdwa
+      POSTGRES_PASSWORD: fdwa_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - fd_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fdwa -d fdwa"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build:
+      context: ./fd-backend
+      dockerfile: Dockerfile
+    container_name: fd-backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/fdwa
+      SPRING_DATASOURCE_USERNAME: fdwa
+      SPRING_DATASOURCE_PASSWORD: fdwa_password
+
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+
+
+      APP_SEED_ENABLED: "true"
+      APP_SEED_ADMINS: "10"
+      APP_SEED_EMPLOYEES: "200"
+      APP_SEED_CLIENTS: "150"
+      APP_SEED_INVENTORY: "200"
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build:
+      context: ./fd-frontend
+      dockerfile: Dockerfile
+    container_name: fd-frontend
+    depends_on:
+      - backend
+    environment:
+
+      NEXT_PUBLIC_API_BASE_URL: "http://localhost:8080"
+
+
+      INTERNAL_API_BASE_URL: "http://backend:8080"
+    ports:
+      - "3000:3000"
+
+volumes:
+  fd_db_data:

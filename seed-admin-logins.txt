@@ -1,0 +1,13 @@
+Admin logins (username / password)
+=================================
+admin001 / Adm!990817
+admin002 / Adm!280624
+admin003 / Adm!831769
+admin004 / Adm!085924
+admin005 / Adm!213099
+admin006 / Adm!059589
+admin007 / Adm!603090
+admin008 / Adm!546810
+admin009 / Adm!355840
+admin010 / Adm!180321
+admin / admin123
